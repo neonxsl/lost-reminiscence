@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://skeleton.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://sprites/enemies/vampire/vampire_1.png" id="2_f1"]
+[ext_resource type="Texture2D" path="res://sprites/enemies/vampire/vampire_2.png" id="3_f2"]
+[ext_resource type="Texture2D" path="res://sprites/enemies/vampire/vampire_3.png" id="4_f3"]
+[ext_resource type="Texture2D" path="res://sprites/enemies/vampire/vampire_4.png" id="5_f4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vampire"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_f1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_f2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_f3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_f4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(20, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
+size = Vector2(16, 20)
+
+[node name="Vampire" type="CharacterBody2D"]
+script = ExtResource("1_script")
+speed = 28.0
+chase_range = 112.0
+max_health = 8
+knockback_strength = 90.0
+hit_rest_time = 1.5
+boss_name = "Vampire"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_vampire")
+autoplay = "default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_hit")

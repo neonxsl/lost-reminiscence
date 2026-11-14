@@ -41,6 +41,10 @@ var dying = false
 var death_overlay
 var bounce_button
 var hover_tween
+var boss_bar
+var boss_label
+var boss_fill
+var boss_tween
 
 func _ready():
 	add_to_group("hud")
@@ -49,6 +53,7 @@ func _ready():
 	notice.modulate.a = 0.0
 	dialogue.hide()
 	_build_death_ui()
+	_build_boss_bar()
 	_connect_player.call_deferred()
 	_fade_music_in.call_deferred()
 
@@ -68,6 +73,64 @@ func _fade_music_in():
 	var target = music.volume_db
 	music.volume_db = -40.0
 	create_tween().tween_property(music, "volume_db", target, 1.5)
+
+func _build_boss_bar():
+	boss_bar = Control.new()
+	boss_bar.visible = false
+	boss_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(boss_bar)
+	root.move_child(boss_bar, death_overlay.get_index())
+	boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	boss_bar.offset_left = -61
+	boss_bar.offset_right = 61
+	boss_bar.offset_top = -28
+	boss_bar.offset_bottom = -8
+
+	boss_label = Label.new()
+	boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER ## is this how u centre a div lol
+	boss_label.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
+	boss_label.add_theme_font_size_override("font_size", 8)
+	boss_label.add_theme_color_override("font_color", Color(0.995, 0.796, 0.0, 1.0))
+	boss_label.add_theme_color_override("font_outline_color", Color(0.103, 0.08, 0.113, 1.0))
+	boss_label.add_theme_constant_override("outline_size", 4)
+	boss_label.size = Vector2(122, 10)
+	boss_bar.add_child(boss_label)
+
+	var frame = ColorRect.new()
+	frame.color = Color(0.988, 0.8, 0.0, 1.0)
+	frame.position = Vector2(0, 12)
+	frame.size = Vector2(122, 8)
+	boss_bar.add_child(frame)
+	var back = ColorRect.new()
+	back.color = Color(0.172, 0.119, 0.093, 1.0)
+	back.position = Vector2(1, 1)
+	back.size = Vector2(120, 6)
+	frame.add_child(back)
+	boss_fill = ColorRect.new()
+	boss_fill.color = Color(0.843, 0.311, 0.209, 1.0)
+	boss_fill.size = Vector2(120, 6)
+	back.add_child(boss_fill)
+
+func show_boss(boss_name, health, max_health):
+	boss_label.text = boss_name
+	update_boss(health, max_health)
+	if boss_tween:
+		boss_tween.kill()
+	boss_bar.modulate.a = 0.0
+	boss_bar.show()
+	boss_tween = create_tween()
+	boss_tween.tween_property(boss_bar, "modulate:a", 1.0, 0.4)
+
+func update_boss(health, max_health):
+	boss_fill.size.x = round(120.0 * health / max_health)
+
+func hide_boss():
+	if boss_tween:
+		boss_tween.kill()
+	boss_tween = create_tween()
+	boss_tween.tween_interval(0.4)
+	boss_tween.tween_property(boss_bar, "modulate:a", 0.0, 0.6)
+	boss_tween.tween_callback(boss_bar.hide)
 
 func _build_death_ui():
 	death_overlay = ColorRect.new()
@@ -126,6 +189,9 @@ func player_died():
 	if notice_tween:
 		notice_tween.kill()
 	notice.modulate.a = 0.0
+	if boss_tween:
+		boss_tween.kill()
+	boss_bar.hide() ## this bug fixed yayadhahsdyhasydayhsdyh
 	var music = _music()
 	if music:
 		create_tween().tween_property(music, "volume_db", -40.0, 1.2)
