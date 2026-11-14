@@ -1,6 +1,8 @@
 extends Area2D
 
 @export_multiline var dialogue_text = ""
+@export var grants = ""
+@export var grants_notice = ""
 
 @onready var sprite = $Sprite2D
 
@@ -35,5 +37,18 @@ func _on_body_entered(body):
 	var hud = get_tree().get_first_node_in_group("hud")
 	if hud:
 		await hud.play_dialogue(_parse_lines())
-		hud.memory_found()
+	if hud:
+		hud.memory_found(name)
+	var blessing = ""
+	if offer_blessing and hud and body.has_method("unlock"):
+		blessing = await hud.choose_blessing()
+		body.unlock(blessing)
+	if grants == "ending" and hud:
+		hud.play_ending()
+	elif grants != "" and body.has_method("unlock"):
+		body.unlock(grants)
+		if hud and grants_notice != "":
+			hud.show_notice(grants_notice, 3.5)
+	if blessing != "" and hud:
+		hud.show_notice(hud.BLESSINGS[blessing][1], 3.5)
 	queue_free()

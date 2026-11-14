@@ -5,6 +5,7 @@ const ATTACK_DAMAGE = 1
 const ATTACK_COOLDOWN = 0.4
 const ATTACK_REACH = 12.0
 const SWING_TIME = 0.15
+const AWAKENED_TEXTURE = preload("res://sprites/player/priest_awakened.png")
 
 signal health_changed(health, max_health)
 
@@ -18,16 +19,34 @@ var facing = Vector2.RIGHT
 var attack_timer = 0.0
 var attack_area
 var slash
+var can_dash = false
+var dashing = false
+var dash_timer = 0.0
+var dash_cooldown = 0.0
+var dash_direction = Vector2.RIGHT
+var dash_hit = []
+var ghost_timer = 0.0
+var normal_frames
+var grace_timer = 0.0
+var dash_frames
 
 func _ready():
 	add_to_group("player")
 	collision_layer = 4
 	collision_mask = 1
 	anim.play("default")
+	normal_frames = anim.sprite_frames
+	dash_frames = SpriteFrames.new()
+	dash_frames.add_frame("default", AWAKENED_TEXTURE)
 	_setup_attack_input()
 	_setup_attack()
 
 func _setup_attack_input():
+	if not InputMap.has_action("dash"):
+		InputMap.add_action("dash")
+		var q = InputEventKey.new()
+		q.physical_keycode = KEY_Q
+		InputMap.action_add_event("dash", q)
 	if InputMap.has_action("attack"):
 		return
 	InputMap.add_action("attack")
@@ -56,8 +75,20 @@ func _setup_attack():
 	slash.visible = false
 	add_child(slash)
 
+func unlock(ability):
+	if ability == "dash":
+		can_dash = true
+
 func _physics_process(delta):
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	dash_cooldown = max(dash_cooldown - delta, 0.0)
+	grace_timer = max(grace_timer - delta, 0.0)
+	anim.self_modulate.a = 0.6 if grace_timer > 0.0 else 1.0
+	if can_dash and not dashing and dash_cooldown == 0.0 and Input.is_action_just_pressed("dash"):
+		_start_dash(direction)
+	if dashing:
+		_dash_step(delta)
+		return
 	velocity = direction * SPEED
 	move_and_slide()
 
@@ -87,9 +118,45 @@ func _attack():
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("hurt"):
 			body.hurt(ATTACK_DAMAGE, global_position)
+			grace_timer = 0.5
+
+func _start_dash(direction):
+	dashing = true
+	dash_timer = .18
+	dash_direction = direction.normalized() if direction != Vector2.ZERO else facing
+	dash_hit = []
+	ghost_timer = 0.0
+	steps.stop()
+	if dash_direction.x != 0:
+		anim.flip_h = dash_direction.x < 0
+	anim.sprite_frames = dash_frames
+	anim.offset = Vector2(4, 0)
+	anim.play("default")
+
+func _dash_step(delta):
+	velocity = dash_direction * 220
+	move_and_slide()
+	attack_area.position = Vector2.ZERO
+	for body in attack_area.get_overlapping_bodies():
+		if body.has_method("hurt") and not body in dash_hit:
+			dash_hit.append(body)
+			body.hurt(1, global_position)
+	ghost_timer -= delta
+	if ghost_timer <= 0.0:
+		ghost_timer = 0.03
+	dash_timer -= delta
+	if dash_timer <= 0.0:
+		dashing = false
+		dash_cooldown = 0.6
+		grace_timer = 0.5
+		anim.sprite_frames = normal_frames
+		anim.offset = Vector2.ZERO
+		anim.play("default")
+
+
 
 func take_damage(amount):
-	if invincible:
+	if invincible or dashing or grace_timer > 0.0:
 		return false
 	health -= amount
 	health_changed.emit(health, max_health)

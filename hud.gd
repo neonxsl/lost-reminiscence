@@ -36,6 +36,7 @@ var line_index = 0
 var typing = false
 var char_timer = 0.0
 var notice_tween
+var notice_queue = []
 var stay_paused = false
 var dying = false
 var death_overlay
@@ -188,6 +189,7 @@ func player_died():
 	get_tree().paused = true
 	if notice_tween:
 		notice_tween.kill()
+	notice_queue.clear()
 	notice.modulate.a = 0.0
 	if boss_tween:
 		boss_tween.kill()
@@ -236,15 +238,29 @@ func _update_hearts(health, max_health):
 		hearts.add_child(heart)
 
 func show_notice(message, seconds = 3.0):
-	notice.text = message
+	notice_queue.append([message, seconds])
+	if notice_queue.size() == 1:
+		_next_notice()
+
+func _next_notice():
+	if notice_queue.is_empty():
+		return
+	var item = notice_queue[0]
+	notice.text = item[0]
 	if notice_tween:
 		notice_tween.kill()
 	notice_tween = create_tween()
 	notice_tween.tween_property(notice, "modulate:a", 1.0, 0.3)
-	notice_tween.tween_interval(seconds)
+	notice_tween.tween_interval(item[1])
 	notice_tween.tween_property(notice, "modulate:a", 0.0, 0.6)
+	notice_tween.tween_callback(_notice_done)
 
-func memory_found():
+func _notice_done():
+	if not notice_queue.is_empty():
+		notice_queue.pop_front()
+	_next_notice()
+
+func memory_found(id = ""):
 	memories_found += 1
 	show_notice("%d/%d memories found" % [memories_found, TOTAL_MEMORIES])
 
