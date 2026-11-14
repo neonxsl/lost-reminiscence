@@ -1,17 +1,16 @@
 [gd_scene format=4 uid="uid://ckmh7vxg0ayqa"]
 
 [ext_resource type="Texture2D" uid="uid://4y7m382w0p3l" path="res://assets/0x72_16x16DungeonTileset.v5/0x72_16x16DungeonTileset.v5.png" id="1_1bvp3"]
-[ext_resource type="Texture2D" uid="uid://c18epjyu3cy4k" path="res://atlas_floor-16x16.png" id="2_lquwl"]
-[ext_resource type="Texture2D" uid="uid://eg1uds5d72ak" path="res://atlas_walls_high-16x32.png" id="3_7mycd"]
-[ext_resource type="Texture2D" uid="uid://db5r87p4ecbui" path="res://0x72_DungeonTilesetII_v1.7.png" id="4_272bh"]
+[ext_resource type="Texture2D" uid="uid://c18epjyu3cy4k" path="res://sprites/tiles/atlas_floor-16x16.png" id="2_lquwl"]
+[ext_resource type="Texture2D" uid="uid://eg1uds5d72ak" path="res://sprites/tiles/atlas_walls_high-16x32.png" id="3_7mycd"]
+[ext_resource type="Texture2D" uid="uid://db5r87p4ecbui" path="res://sprites/tiles/0x72_DungeonTilesetII_v1.7.png" id="4_272bh"]
 [ext_resource type="Script" uid="uid://bk3ykmssptmpr" path="res://player.gd" id="5_7mycd"]
-[ext_resource type="Texture2D" uid="uid://d4eo7eahnrypa" path="res://assets/2D Pixel Dungeon Asset Pack/Character_animation/priests_idle/priest1/v1/priest1_v1_1.png" id="6_272bh"]
-[ext_resource type="Texture2D" uid="uid://c7ickttidkqxg" path="res://priest1_v1_1.png" id="7_4c57u"]
-[ext_resource type="Texture2D" uid="uid://bhbf6hjfug8es" path="res://priest1_v1_2.png" id="8_efxa6"]
-[ext_resource type="Texture2D" uid="uid://c6mcqnc51f5ce" path="res://priest1_v1_3.png" id="9_dg77c"]
-[ext_resource type="Texture2D" uid="uid://b43dvoaicn7r1" path="res://priest1_v1_4.png" id="10_ycdy4"]
-[ext_resource type="AudioStream" uid="uid://dgwiti1tfyb0k" path="res://footstep.mp3" id="11_dg77c"]
-[ext_resource type="AudioStream" uid="uid://wyd46f4ikatf" path="res://music_jewels.ogg" id="11_efxa6"]
+[ext_resource type="Texture2D" uid="uid://c7ickttidkqxg" path="res://sprites/player/priest1_v1_1.png" id="7_4c57u"]
+[ext_resource type="Texture2D" uid="uid://bhbf6hjfug8es" path="res://sprites/player/priest1_v1_2.png" id="8_efxa6"]
+[ext_resource type="Texture2D" uid="uid://c6mcqnc51f5ce" path="res://sprites/player/priest1_v1_3.png" id="9_dg77c"]
+[ext_resource type="Texture2D" uid="uid://b43dvoaicn7r1" path="res://sprites/player/priest1_v1_4.png" id="10_ycdy4"]
+[ext_resource type="AudioStream" uid="uid://dgwiti1tfyb0k" path="res://audio/footstep.mp3" id="11_dg77c"]
+[ext_resource type="AudioStream" uid="uid://wyd46f4ikatf" path="res://audio/music_jewels.ogg" id="11_efxa6"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5vw27"]
 texture = ExtResource("1_1bvp3")
@@ -1240,21 +1239,20 @@ tile_set = SubResource("TileSet_oh2c4")
 [node name="Player" type="CharacterBody2D" parent="." unique_id=1290878900]
 script = ExtResource("5_7mycd")
 
-[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=641179848]
-texture = ExtResource("6_272bh")
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=769888027]
 shape = SubResource("RectangleShape2D_88rtp")
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=829722582]
 zoom = Vector2(5.4, 5.4)
 position_smoothing_enabled = true
+position_smoothing_speed = 3.28
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player" unique_id=25320413]
 sprite_frames = SubResource("SpriteFrames_88rtp")
-frame_progress = 0.27352947
+frame_progress = 0.85821676
 
 [node name="Footsteps" type="AudioStreamPlayer2D" parent="Player" unique_id=1996332215]
+visible = false
 stream = ExtResource("11_dg77c")
 volume_db = 13.121
 

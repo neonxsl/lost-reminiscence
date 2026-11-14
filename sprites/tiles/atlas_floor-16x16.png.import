@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhbf6hjfug8es"
-path="res://.godot/imported/priest1_v1_2.png-eb5ef84d5526f630eef3cc0deeabb737.ctex"
+uid="uid://c18epjyu3cy4k"
+path="res://.godot/imported/atlas_floor-16x16.png-d262e83acd15ad5d056fd23cafc50661.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://priest1_v1_2.png"
-dest_files=["res://.godot/imported/priest1_v1_2.png-eb5ef84d5526f630eef3cc0deeabb737.ctex"]
+source_file="res://sprites/tiles/atlas_floor-16x16.png"
+dest_files=["res://.godot/imported/atlas_floor-16x16.png-d262e83acd15ad5d056fd23cafc50661.ctex"]
 
 [params]
 
