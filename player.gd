@@ -94,7 +94,13 @@ func take_damage(amount):
 	health -= amount
 	health_changed.emit(health, max_health)
 	if health <= 0:
-		get_tree().call_deferred("reload_current_scene")
+		invincible = true
+		steps.stop()
+		var hud = get_tree().get_first_node_in_group("hud")
+		if hud:
+			hud.player_died.call_deferred()
+		else:
+			get_tree().call_deferred("reload_current_scene")
 		return true
 	invincible = true
 	var tween = create_tween()
