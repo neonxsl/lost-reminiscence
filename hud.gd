@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal dialogue_finished
+signal progress_changed
 
 static var music_fade_in = false
 
@@ -37,6 +38,8 @@ var typing = false
 var char_timer = 0.0
 var notice_tween
 var notice_queue = []
+var defeated_bosses = []
+var collected_memories = []
 var stay_paused = false
 var dying = false
 var death_overlay
@@ -262,7 +265,13 @@ func _notice_done():
 
 func memory_found(id = ""):
 	memories_found += 1
+	collected_memories.append(id)
 	show_notice("%d/%d memories found" % [memories_found, TOTAL_MEMORIES])
+	progress_changed.emit.call_deferred()
+
+func boss_defeated(boss_name):
+	defeated_bosses.append(boss_name)
+	progress_changed.emit()
 
 func play_dialogue(new_lines, keep_paused = false):
 	lines = new_lines
