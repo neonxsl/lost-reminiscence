@@ -2,9 +2,12 @@ extends CharacterBody2D
 
 const SPEED = 60.0
 
+signal health_changed(health, max_health)
+
 @onready var anim = $AnimatedSprite2D
 @onready var steps = $Footsteps
 
+var max_health = 3
 var health = 3
 var invincible = false
 
@@ -32,6 +35,7 @@ func take_damage(amount):
 	if invincible:
 		return false
 	health -= amount
+	health_changed.emit(health, max_health)
 	if health <= 0:
 		get_tree().call_deferred("reload_current_scene")
 		return true

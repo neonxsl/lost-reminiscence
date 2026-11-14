@@ -13,6 +13,8 @@
 [ext_resource type="AudioStream" uid="uid://wyd46f4ikatf" path="res://audio/music_jewels.ogg" id="11_efxa6"]
 [ext_resource type="PackedScene" path="res://skeleton.tscn" id="12_skel1"]
 [ext_resource type="PackedScene" path="res://skeleton2.tscn" id="13_skel2"]
+[ext_resource type="PackedScene" path="res://hud.tscn" id="14_hud"]
+[ext_resource type="PackedScene" path="res://memory.tscn" id="15_memory"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5vw27"]
 texture = ExtResource("1_1bvp3")
@@ -1259,6 +1261,7 @@ stream = ExtResource("11_dg77c")
 volume_db = 13.121
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1838758509]
+process_mode = 3
 stream = ExtResource("11_efxa6")
 autoplay = true
 
@@ -1279,3 +1282,9 @@ position = Vector2(-432, -160)
 
 [node name="Skeleton6" parent="." instance=ExtResource("13_skel2")]
 position = Vector2(-144, -160)
+
+[node name="Memory1" parent="." instance=ExtResource("15_memory")]
+position = Vector2(56, 0)
+dialogue_text = "A mysterious figure approaches.\n???: I know you will forgive me one day.\nYou: What are you talking about? Why am I here? Who am I?\nFind yourself..."
+
+[node name="HUD" parent="." instance=ExtResource("14_hud")]

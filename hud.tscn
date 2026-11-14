@@ -1,0 +1,107 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://hud.gd" id="1_hud"]
+[ext_resource type="FontFile" path="res://fonts/lazyfox.ttf" id="2_font"]
+[ext_resource type="Texture2D" path="res://sprites/ui/dialog_panel.png" id="3_panel"]
+[ext_resource type="AudioStream" path="res://audio/blip.mp3" id="4_blip"]
+
+[node name="HUD" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+
+[node name="Hearts" type="HBoxContainer" parent="Root"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 60.0
+offset_bottom = 18.0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Notice" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 24.0
+offset_bottom = 36.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.98, 0.8, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+
+[node name="Dialogue" type="NinePatchRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -62.0
+offset_right = -24.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("3_panel")
+patch_margin_left = 12
+patch_margin_top = 12
+patch_margin_right = 12
+patch_margin_bottom = 12
+
+[node name="Speaker" type="Label" parent="Root/Dialogue"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 9.0
+offset_right = 200.0
+offset_bottom = 19.0
+theme_override_colors/font_color = Color(0.98, 0.8, 0.24, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+
+[node name="Text" type="Label" parent="Root/Dialogue"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 21.0
+offset_right = -12.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.93, 0.93, 0.95, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+
+[node name="Next" type="Label" parent="Root/Dialogue"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -16.0
+offset_right = -10.0
+offset_bottom = -6.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.98, 0.8, 0.24, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+text = ">"
+
+[node name="Blip" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_blip")
+volume_db = -6.0
