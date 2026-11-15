@@ -19,6 +19,19 @@ const PIXEL_BUTTON = preload("res://pixel_button.gd")
 
 const MENU_SCENE = "res://menu.tscn"
 
+const BLESSINGS = {
+	"resistance": ["Resistance", "Blessing: you take 25% less damage", "Take 25% less damage"],
+	"speed": ["Speed", "Blessing: you move 25% faster", "Move 25% faster"],
+}
+
+signal blessing_chosen(blessing)
+
+const ENDING_LINES = [
+	"He rushes through the maze, his memories guiding him",
+	"Alone he stood in this prison.",
+	"Alone he left.",
+	"Thanks for playing Lost Reminiscence.",
+]
 
 const DEATH_LINES = [
 	["", "Everything fades to black..."],
@@ -389,6 +402,102 @@ func memory_found(id = ""):
 	collected_memories.append(id)
 	show_notice("%d/%d memories found" % [memories_found, TOTAL_MEMORIES])
 	progress_changed.emit.call_deferred()
+
+func play_ending():
+	get_tree().paused = true
+	in_intro = true
+	await get_tree().create_timer(2.5).timeout
+	var music = _music()
+	if music:
+		create_tween().tween_property(music, "volume_db", -40.0, 2.0)
+	var backdrop = ColorRect.new()
+	backdrop.color = Color(0.02, 0.01, 0.02)
+	backdrop.modulate.a = 0.0
+	root.add_child(backdrop)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var fade = create_tween()
+	fade.tween_property(backdrop, "modulate:a", 1.0, 1.5)
+	await fade.finished
+	var label = Label.new()
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
+	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_color_override("font_color", Color(0.93, 0.9, 0.85))
+	backdrop.add_child(label)
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.offset_left = 60
+	label.offset_right = -60
+	for i in ENDING_LINES.size():
+		label.text = ENDING_LINES[i]
+		label.modulate.a = 0.0
+		var t = create_tween()
+		t.tween_property(label, "modulate:a", 1.0, 0.8)
+		if i < ENDING_LINES.size() - 1:
+			t.tween_interval(2.0)
+			t.tween_property(label, "modulate:a", 0.0, 0.6)
+		await t.finished
+	in_intro = false
+	var button = PIXEL_BUTTON.new()
+	button.text = "Main Menu"
+	button.custom_minimum_size = Vector2(96, 26)
+	button.pressed.connect(_main_menu)
+	button.hovered.connect(_menu_blip)
+	backdrop.add_child(button)
+	button.position = Vector2((root.size.x - 96) / 2, root.size.y / 2 + 24)
+	button.grab_focus()
+
+## no one will ever see this ... :DDDDD
+
+func choose_blessing():
+	get_tree().paused = true
+	var screen = Control.new()
+	root.add_child(screen)
+	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var dim = ColorRect.new()
+	dim.color = Color(0.04, 0.02, 0.03, 0.7)
+	screen.add_child(dim)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var title = _ui_label("Choose a blessing", Color(0.98, 0.8, 0.24))
+	title.add_theme_color_override("font_outline_color", Color(0.1, 0.08, 0.12))
+	title.add_theme_constant_override("outline_size", 4)
+	screen.add_child(title)
+	title.position = Vector2(0, root.size.y / 2 - 44)
+	title.size = Vector2(root.size.x, 10)
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	screen.add_child(row)
+	var first: Control = null
+	for key in BLESSINGS:
+		var column = VBoxContainer.new()
+		column.add_theme_constant_override("separation", 4)
+		row.add_child(column)
+		var button = PIXEL_BUTTON.new()
+		button.text = BLESSINGS[key][0]
+		button.custom_minimum_size = Vector2(96, 26)
+		button.pressed.connect(func(): blessing_chosen.emit(key))
+		button.hovered.connect(_menu_blip)
+		column.add_child(button)
+		var info = _ui_label(BLESSINGS[key][2], Color(0.85, 0.8, 0.72))
+		column.add_child(info)
+		if first == null:
+			first = button
+	row.position = Vector2((root.size.x - 208) / 2, root.size.y / 2 - 26)
+	first.grab_focus()
+	var choice = await blessing_chosen
+	screen.queue_free()
+	get_tree().paused = false
+	return choice
+
+func _ui_label(text_value, color):
+	var label = Label.new()
+	label.text = text_value
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
+	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_color_override("font_color", color)
+	return label
 
 func boss_defeated(boss_name):
 	defeated_bosses.append(boss_name)

@@ -15,7 +15,9 @@ signal health_changed(health, max_health)
 @onready var steps = $Footsteps
 
 var max_health = 3
-var health = 3
+var health = 3.0
+var damage_multiplier = 1.0
+var speed_multiplier = 1.0
 var invincible = false
 var facing = Vector2.RIGHT
 var attack_timer = 0.0
@@ -94,6 +96,10 @@ func _setup_attack():
 func unlock(ability):
 	if ability == "dash":
 		can_dash = true
+	elif ability == "resistance":
+		damage_multiplier = 1.0 - 0.25
+	elif ability == "speed":
+		speed_multiplier = 1.0 + 0.25
 
 func _physics_process(delta):
 	var direction = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -105,7 +111,7 @@ func _physics_process(delta):
 	if dashing:
 		_dash_step(delta)
 		return
-	velocity = direction * SPEED
+	velocity = direction * SPEED * speed_multiplier
 	move_and_slide()
 
 	if direction != Vector2.ZERO:
@@ -176,10 +182,10 @@ func _dash_step(delta):
 func take_damage(amount):
 	if invincible or dashing or grace_timer > 0.0:
 		return false
-	health -= amount
+	health -= amount * damage_multiplier
 	health_changed.emit(health, max_health)
 	hurt_sound.play()
-	if health <= 0:
+	if health <= 0.001:
 		invincible = true
 		steps.stop()
 		var hud = get_tree().get_first_node_in_group("hud")

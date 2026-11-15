@@ -3,6 +3,7 @@ extends Area2D
 @export_multiline var dialogue_text = ""
 @export var grants = ""
 @export var grants_notice = ""
+@export var offer_blessing = false
 
 @onready var sprite = $Sprite2D
 
