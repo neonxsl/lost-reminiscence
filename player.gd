@@ -6,6 +6,8 @@ const ATTACK_COOLDOWN = 0.4
 const ATTACK_REACH = 12.0
 const SWING_TIME = 0.15
 const AWAKENED_TEXTURE = preload("res://sprites/player/priest_awakened.png")
+const HURT_SOUND = preload("res://audio/hurt.mp3")
+const ATTACK_SOUND = preload("res://audio/attack.mp3")
 
 signal health_changed(health, max_health)
 
@@ -28,6 +30,8 @@ var dash_hit = []
 var ghost_timer = 0.0
 var normal_frames
 var grace_timer = 0.0
+var hurt_sound
+var attack_sound
 var dash_frames
 
 func _ready():
@@ -40,8 +44,20 @@ func _ready():
 	dash_frames.add_frame("default", AWAKENED_TEXTURE)
 	_setup_attack_input()
 	_setup_attack()
+	hurt_sound = AudioStreamPlayer.new()
+	hurt_sound.stream = HURT_SOUND
+	hurt_sound.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(hurt_sound)
+	attack_sound = AudioStreamPlayer.new()
+	attack_sound.stream = ATTACK_SOUND
+	add_child(attack_sound)
 
 func _setup_attack_input():
+	for pair in [["ui_up", KEY_W], ["ui_left", KEY_A], ["ui_down", KEY_S], ["ui_right", KEY_D]]:
+		var key = InputEventKey.new()
+		key.physical_keycode = pair[1]
+		if not InputMap.action_has_event(pair[0], key):
+			InputMap.action_add_event(pair[0], key)
 	if not InputMap.has_action("dash"):
 		InputMap.add_action("dash")
 		var q = InputEventKey.new()
@@ -109,6 +125,8 @@ func _physics_process(delta):
 
 func _attack():
 	attack_timer = ATTACK_COOLDOWN
+	attack_sound.pitch_scale = randf_range(0.95, 1.05)
+	attack_sound.play()
 	slash.rotation = facing.angle()
 	slash.modulate.a = 1.0
 	slash.visible = true
@@ -160,6 +178,7 @@ func take_damage(amount):
 		return false
 	health -= amount
 	health_changed.emit(health, max_health)
+	hurt_sound.play()
 	if health <= 0:
 		invincible = true
 		steps.stop()
