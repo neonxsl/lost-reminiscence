@@ -1,25 +1,21 @@
 extends Button
 
-const FONT = preload("res://fonts/lazyfox.ttf")
-const PANEL = preload("res://sprites/ui/dialog_panel.png")
-const GOLD = Color(0.98, 0.8, 0.24)
-
 signal hovered
 
 var hover_tween
 
 func _ready():
-	add_theme_font_override("font", FONT)
+	add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
 	add_theme_font_size_override("font_size", 8)
-	add_theme_color_override("font_color", GOLD)
+	add_theme_color_override("font_color", Color(0.98, 0.8, 0.24))
 	add_theme_color_override("font_hover_color", Color.WHITE)
 	add_theme_color_override("font_focus_color", Color.WHITE)
-	add_theme_color_override("font_pressed_color", GOLD)
-	add_theme_color_override("font_hover_pressed_color", GOLD)
+	add_theme_color_override("font_pressed_color", Color(0.98, 0.8, 0.24))
+	add_theme_color_override("font_hover_pressed_color", Color(0.98, 0.8, 0.24))
 	add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	for state in ["normal", "hover", "pressed"]:
 		var box = StyleBoxTexture.new()
-		box.texture = PANEL
+		box.texture = preload("res://sprites/ui/dialog_panel.png")
 		box.set_texture_margin_all(12)
 		box.set_content_margin_all(10)
 		if state == "hover":

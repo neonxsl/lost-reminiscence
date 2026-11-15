@@ -6,10 +6,6 @@ signal progress_changed
 static var music_fade_in = false
 static var intro_played = false
 
-const UI_SCALE = 3
-const TOTAL_MEMORIES = 3
-const CHARS_PER_SEC = 40.0
-
  ## for the texturess (see liscence for creditss :D)
 
 const PANEL = preload("res://sprites/ui/dialog_panel.png")
@@ -312,7 +308,7 @@ func _bounce_back():
 
 func _fit():
 	var screen_scale = get_viewport().get_final_transform().get_scale().x
-	var pixel_scale = max(1.0, round(screen_scale * UI_SCALE))
+	var pixel_scale = max(1.0, round(screen_scale * 3))
 	var layer_scale = pixel_scale / screen_scale
 	scale = Vector2(layer_scale, layer_scale)
 	root.size = get_viewport().get_visible_rect().size / layer_scale
@@ -400,7 +396,7 @@ func _notice_done():
 func memory_found(id = ""):
 	memories_found += 1
 	collected_memories.append(id)
-	show_notice("%d/%d memories found" % [memories_found, TOTAL_MEMORIES])
+	show_notice("%d/%d memories found" % [memories_found, 3])
 	progress_changed.emit.call_deferred()
 
 func play_ending():
@@ -530,7 +526,7 @@ func _finish_line():
 func _process(delta):
 	if not typing:
 		return
-	char_timer += delta * CHARS_PER_SEC
+	char_timer += delta * 40
 	var shown = int(char_timer)
 	if shown > text.visible_characters:
 		if shown % 3 == 0 and text.text[min(shown, text.text.length()) - 1] != " ":

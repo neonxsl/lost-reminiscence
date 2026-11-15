@@ -1,9 +1,6 @@
 extends CharacterBody2D
 
 const SPEED = 60.0
-const AWAKENED_TEXTURE = preload("res://sprites/player/priest_awakened.png")
-const HURT_SOUND = preload("res://audio/hurt.mp3")
-const ATTACK_SOUND = preload("res://audio/attack.mp3")
 
 signal health_changed(health, max_health)
 
@@ -39,15 +36,15 @@ func _ready():
 	anim.play("default")
 	normal_frames = anim.sprite_frames
 	dash_frames = SpriteFrames.new()
-	dash_frames.add_frame("default", AWAKENED_TEXTURE)
+	dash_frames.add_frame("default", preload("res://sprites/player/priest_awakened.png"))
 	_setup_attack_input()
 	_setup_attack()
 	hurt_sound = AudioStreamPlayer.new()
-	hurt_sound.stream = HURT_SOUND
+	hurt_sound.stream = preload("res://audio/hurt.mp3")
 	hurt_sound.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hurt_sound)
 	attack_sound = AudioStreamPlayer.new()
-	attack_sound.stream = ATTACK_SOUND
+	attack_sound.stream = preload("res://audio/attack.mp3")
 	add_child(attack_sound)
 
 func _setup_attack_input():

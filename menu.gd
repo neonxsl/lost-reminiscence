@@ -1,6 +1,5 @@
 extends Node2D
 
-const UI_SCALE = 3
 const GAME_SCENE = "res://main.tscn"
 const VIEW_POSITION = Vector2(-540, -30)
 
@@ -41,7 +40,7 @@ func _load_dungeon():
 
 func _fit():
 	var screen_scale = get_viewport().get_final_transform().get_scale().x
-	var pixel_scale = max(1.0, round(screen_scale * UI_SCALE))
+	var pixel_scale = max(1.0, round(screen_scale * 3))
 	var layer_scale = pixel_scale / screen_scale
 	ui.scale = Vector2(layer_scale, layer_scale)
 	root.size = get_viewport().get_visible_rect().size / layer_scale
