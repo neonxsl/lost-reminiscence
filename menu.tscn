@@ -1,0 +1,154 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://menu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://pixel_button.gd" id="2_button"]
+[ext_resource type="AudioStream" path="res://audio/blip.mp3" id="3_blip"]
+[ext_resource type="FontFile" path="res://fonts/lazyfox.ttf" id="4_font"]
+[ext_resource type="Texture2D" path="res://sprites/ui/title_logo.png" id="5_logo"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_logo"]
+atlas = ExtResource("5_logo")
+region = Rect2(5, 23, 115, 79)
+
+[node name="Menu" type="Node2D"]
+script = ExtResource("1_menu")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(4, 4)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+
+[node name="Dim" type="ColorRect" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.02, 0.03, 0.55)
+
+[node name="Logo" type="TextureRect" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -58.0
+offset_top = 14.0
+offset_right = 57.0
+offset_bottom = 93.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_logo")
+
+[node name="Buttons" type="VBoxContainer" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -48.0
+offset_top = 2.0
+offset_right = 48.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="Play" type="Button" parent="UI/Root/Buttons"]
+custom_minimum_size = Vector2(96, 30)
+layout_mode = 2
+text = "Play"
+script = ExtResource("2_button")
+
+[node name="Quit" type="Button" parent="UI/Root/Buttons"]
+custom_minimum_size = Vector2(96, 30)
+layout_mode = 2
+text = "Quit"
+script = ExtResource("2_button")
+
+[node name="Fade" type="ColorRect" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.02, 0.03, 1)
+
+[node name="Loading" type="Control" parent="UI/Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -20.0
+offset_right = 70.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="UI/Root/Loading"]
+layout_mode = 0
+offset_left = 10.0
+offset_right = 130.0
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(0.98, 0.8, 0.24, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 8
+text = "Loading"
+
+[node name="BarFrame" type="ColorRect" parent="UI/Root/Loading"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 14.0
+offset_right = 130.0
+offset_bottom = 22.0
+mouse_filter = 2
+color = Color(0.98, 0.8, 0.24, 1)
+
+[node name="BarBack" type="ColorRect" parent="UI/Root/Loading/BarFrame"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 119.0
+offset_bottom = 7.0
+mouse_filter = 2
+color = Color(0.17, 0.12, 0.1, 1)
+
+[node name="BarFill" type="ColorRect" parent="UI/Root/Loading/BarFrame/BarBack"]
+layout_mode = 0
+offset_right = 0.0
+offset_bottom = 6.0
+mouse_filter = 2
+color = Color(0.87, 0.62, 0.28, 1)
+
+[node name="Tip" type="Label" parent="UI/Root/Loading"]
+layout_mode = 0
+offset_left = -40.0
+offset_top = 32.0
+offset_right = 180.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.72, 0.66, 0.6, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 8
+text = "Every fall is a chance to bounce back."
+horizontal_alignment = 1
+
+[node name="Blip" type="AudioStreamPlayer" parent="UI"]
+stream = ExtResource("3_blip")
+volume_db = -6.0

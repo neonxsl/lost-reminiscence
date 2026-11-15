@@ -4,6 +4,7 @@ signal dialogue_finished
 signal progress_changed
 
 static var music_fade_in = false
+static var intro_played = false
 
 const UI_SCALE = 3
 const TOTAL_MEMORIES = 3
@@ -14,6 +15,10 @@ const HEART_HALF = preload("res://sprites/ui/heart_half.png")
 const HEART_EMPTY = preload("res://sprites/ui/heart_empty.png")
 const FONT = preload("res://fonts/lazyfox.ttf")
 const PANEL = preload("res://sprites/ui/dialog_panel.png")
+const PIXEL_BUTTON = preload("res://pixel_button.gd")
+
+const MENU_SCENE = "res://menu.tscn"
+
 
 const DEATH_LINES = [
 	["", "Everything fades to black..."],
@@ -45,10 +50,24 @@ var dying = false
 var death_overlay
 var bounce_button
 var hover_tween
+var pause_menu
+var resume_button
 var boss_bar
 var boss_label
 var boss_fill
 var boss_tween
+var intro_layer
+var intro_text
+var in_intro = false
+
+const INTRO_LINES = [ ## holy aura speech
+	"Darkness.",
+	"No name. No past. Only cold stone beneath you.",
+	"Your memories lie scattered through this maze, glowing like embers.",
+	"Gather them, and you will remember who you are.",
+	"But something guards the way. A Vampire waits in the halls ahead.",
+	"Defeat it. Find yourself.",
+]
 
 func _ready():
 	add_to_group("hud")
@@ -58,6 +77,7 @@ func _ready():
 	dialogue.hide()
 	_build_death_ui()
 	_build_boss_bar()
+	_build_pause_menu()
 	_connect_player.call_deferred()
 	_fade_music_in.call_deferred()
 
@@ -136,6 +156,70 @@ func hide_boss():
 	boss_tween.tween_property(boss_bar, "modulate:a", 0.0, 0.6)
 	boss_tween.tween_callback(boss_bar.hide)
 
+func _build_pause_menu():
+	pause_menu = Control.new()
+	pause_menu.visible = false
+	root.add_child(pause_menu)
+	pause_menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var dim = ColorRect.new()
+	dim.color = Color(0.041, 0.019, 0.03, 0.65)
+	pause_menu.add_child(dim)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var box = VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	pause_menu.add_child(box)
+	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var title = Label.new()
+	title.text = "Paused"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
+	title.add_theme_font_size_override("font_size", 8)
+	title.add_theme_color_override("font_color", Color(0.995, 0.796, 0.0, 1.0))
+	title.add_theme_color_override("font_outline_color", Color(0.1, 0.08, 0.12, 1.0))
+	title.add_theme_constant_override("outline_size", 4)
+	box.add_child(title)
+
+	var spacer = Control.new()
+	spacer.custom_minimum_size = Vector2(0, 4)
+	box.add_child(spacer)
+
+	resume_button = _pause_button(box, "Resume", _resume)
+	_pause_button(box, "Restart", _restart)
+	_pause_button(box, "Main Menu", _main_menu)
+
+func _pause_button(parent, label, action):
+	var button = PIXEL_BUTTON.new()
+	button.text = label
+	button.custom_minimum_size = Vector2(96, 26) ## gahhh "how do you centre a div?"
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.pressed.connect(action)
+	button.hovered.connect(_menu_blip)
+	parent.add_child(button)
+	return button
+func _menu_blip():
+	blip.pitch_scale = 1.3
+	blip.play()
+func _toggle_pause():
+	if pause_menu.visible:
+		_resume()
+	elif not get_tree().paused and not dying:
+		get_tree().paused = true
+		pause_menu.show()
+		resume_button.grab_focus()
+func _resume():
+	pause_menu.hide()
+	get_tree().paused = false
+
+func _restart():
+	get_tree().paused = false
+	get_tree().reload_current_scene()
+func _main_menu():
+	get_tree().paused = false
+	get_tree().change_scene_to_file(MENU_SCENE)
 func _build_death_ui():
 	death_overlay = ColorRect.new()
 	death_overlay.color = Color(0.04, 0.02, 0.03)
@@ -225,7 +309,44 @@ func _connect_player():
 	if player:
 		player.health_changed.connect(_update_hearts)
 		_update_hearts(player.health, player.max_health)
+	if not intro_played:
+		intro_played = true
+		await _play_intro()
 	show_notice("Walk towards the first memory", 4.0)
+
+func _play_intro():
+	in_intro = true
+	get_tree().paused = true
+	intro_layer = ColorRect.new()
+	intro_layer.color = Color(0.02, 0.01, 0.02, 1.0)
+	root.add_child(intro_layer)
+	intro_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	intro_text = Label.new()
+	intro_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intro_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	intro_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro_text.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
+	intro_text.add_theme_font_size_override("font_size", 8)
+	intro_text.add_theme_color_override("font_color", Color(0.93, 0.9, 0.85))
+	intro_layer.add_child(intro_text)
+	intro_text.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	intro_text.offset_left = 60
+	intro_text.offset_right = -60
+	for line in INTRO_LINES:
+		intro_text.text = line
+		intro_text.modulate.a = 0.0
+		var t = create_tween()
+		t.tween_property(intro_text, "modulate:a", 1.0, 0.8)
+		t.tween_interval(2.0)
+		t.tween_property(intro_text, "modulate:a", 0.0, 0.6)
+		await t.finished
+	intro_text.hide()
+	var out = create_tween()
+	out.tween_property(intro_layer, "modulate:a", 0.0, 1.0)
+	await out.finished
+	intro_layer.queue_free()
+	in_intro = false
+	get_tree().paused = false
 
 func _update_hearts(health, max_health):
 	for child in hearts.get_children():
@@ -311,6 +432,13 @@ func _process(delta):
 		_finish_line()
 
 func _unhandled_input(event):
+	if in_intro:
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_cancel") and not dialogue.visible:
+		get_viewport().set_input_as_handled()
+		_toggle_pause()
+		return
 	if not dialogue.visible:
 		return
 	var pressed = event.is_action_pressed("ui_accept")

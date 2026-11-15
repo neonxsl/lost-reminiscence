@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="lost remeniscence"
-run/main_scene="uid://ckmh7vxg0ayqa"
+run/main_scene="res://menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
