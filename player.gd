@@ -1,10 +1,6 @@
 extends CharacterBody2D
 
 const SPEED = 60.0
-const ATTACK_DAMAGE = 1
-const ATTACK_COOLDOWN = 0.4
-const ATTACK_REACH = 12.0
-const SWING_TIME = 0.15
 const AWAKENED_TEXTURE = preload("res://sprites/player/priest_awakened.png")
 const HURT_SOUND = preload("res://audio/hurt.mp3")
 const ATTACK_SOUND = preload("res://audio/attack.mp3")
@@ -125,23 +121,23 @@ func _physics_process(delta):
 		anim.flip_h = direction.x < 0
 
 	attack_timer = max(attack_timer - delta, 0.0)
-	attack_area.position = facing * ATTACK_REACH
+	attack_area.position = facing * 12.0
 	if Input.is_action_just_pressed("attack") and attack_timer == 0.0:
 		_attack()
 
 func _attack():
-	attack_timer = ATTACK_COOLDOWN
+	attack_timer = 0.4
 	attack_sound.pitch_scale = randf_range(0.95, 1.05)
 	attack_sound.play()
 	slash.rotation = facing.angle()
 	slash.modulate.a = 1.0
 	slash.visible = true
 	var swing = create_tween()
-	swing.tween_property(slash, "modulate:a", 0.0, SWING_TIME)
+	swing.tween_property(slash, "modulate:a", 0.0, 0.15)
 	swing.tween_callback(slash.hide)
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("hurt"):
-			body.hurt(ATTACK_DAMAGE, global_position)
+			body.hurt(1, global_position)
 			grace_timer = 0.5
 
 func _start_dash(direction):
@@ -197,7 +193,7 @@ func take_damage(amount):
 	invincible = true
 	var tween = create_tween()
 	for i in 4:
-		tween.tween_property(anim, "modulate", Color(1, 0.3, 0.3), 0.125)
+		tween.tween_property(anim, "modulate", Color(1.0, 0.293, 0.344, 1.0), 0.125)
 		tween.tween_property(anim, "modulate", Color.WHITE, 0.125)
 	tween.finished.connect(func(): invincible = false)
 	return true

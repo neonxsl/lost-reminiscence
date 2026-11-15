@@ -10,10 +10,8 @@ const UI_SCALE = 3
 const TOTAL_MEMORIES = 3
 const CHARS_PER_SEC = 40.0
 
-const HEART_FULL = preload("res://sprites/ui/heart_full.png")
-const HEART_HALF = preload("res://sprites/ui/heart_half.png")
-const HEART_EMPTY = preload("res://sprites/ui/heart_empty.png")
-const FONT = preload("res://fonts/lazyfox.ttf")
+ ## for the texturess (see liscence for creditss :D)
+
 const PANEL = preload("res://sprites/ui/dialog_panel.png")
 const PIXEL_BUTTON = preload("res://pixel_button.gd")
 
@@ -39,6 +37,8 @@ const DEATH_LINES = [
 	["???", "Falling was never the end of you."],
 	["???", "Get up. Bounce back."],
 ]
+
+## link evarything
 
 @onready var root = $Root
 @onready var hearts = $Root/Hearts
@@ -99,7 +99,8 @@ func _music():
 		if (node is AudioStreamPlayer or node is AudioStreamPlayer2D) and node.autoplay:
 			return node
 	return null
-
+	
+## when goin indo the level
 func _fade_music_in():
 	if not music_fade_in:
 		return
@@ -235,21 +236,20 @@ func _main_menu():
 	get_tree().change_scene_to_file(MENU_SCENE)
 func _build_death_ui():
 	death_overlay = ColorRect.new()
-	death_overlay.color = Color(0.04, 0.02, 0.03)
+	death_overlay.color = Color(0.04, 0.02, 0.03, 1.0)
 	death_overlay.modulate.a = 0.0
 	death_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(death_overlay)
 	root.move_child(death_overlay, dialogue.get_index())
 	death_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
 	bounce_button = Button.new()
 	bounce_button.text = "Bounce Back"
-	bounce_button.add_theme_font_override("font", FONT)
+	bounce_button.add_theme_font_override("font", preload("res://fonts/lazyfox.ttf"))
 	bounce_button.add_theme_font_size_override("font_size", 8)
-	bounce_button.add_theme_color_override("font_color", Color(0.98, 0.8, 0.24))
+	bounce_button.add_theme_color_override("font_color", Color(0.998, 0.795, 0.0, 1.0))
 	bounce_button.add_theme_color_override("font_hover_color", Color.WHITE)
-	bounce_button.add_theme_color_override("font_focus_color", Color(0.98, 0.8, 0.24))
-	bounce_button.add_theme_color_override("font_pressed_color", Color(0.98, 0.8, 0.24))
+	bounce_button.add_theme_color_override("font_focus_color", Color(0.998, 0.795, 0.0, 1.0))
+	bounce_button.add_theme_color_override("font_pressed_color", Color(0.999, 0.794, 0.0, 1.0)) ## trolling holy aura
 	bounce_button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	for state in ["normal", "hover", "pressed"]:
 		var box = StyleBoxTexture.new()
@@ -276,7 +276,7 @@ func _hover_button(on):
 	if hover_tween:
 		hover_tween.kill()
 	hover_tween = create_tween()
-	var target = Vector2(1.08, 1.08) if on else Vector2.ONE
+	var target = Vector2(1.08, 1.08) if on else Vector2.ONE 
 	hover_tween.tween_property(bounce_button, "scale", target, 0.08)
 	if on:
 		blip.pitch_scale = 1.3
@@ -296,7 +296,7 @@ func player_died():
 	boss_bar.hide() ## this bug fixed yayadhahsdyhasydayhsdyh
 	var music = _music()
 	if music:
-		create_tween().tween_property(music, "volume_db", -40.0, 1.2)
+		create_tween().tween_property(music, "volume_db", -40.0, 1.2) ##faaade zaa music for dramatic effect
 	var fade = create_tween()
 	fade.tween_property(death_overlay, "modulate:a", 0.8, 0.8)
 	await fade.finished
@@ -367,11 +367,11 @@ func _update_hearts(health, max_health):
 	for i in max_health:
 		var heart = TextureRect.new()
 		if health >= i + 1:
-			heart.texture = HEART_FULL
+			heart.texture = preload("res://sprites/ui/heart_full.png")
 		elif health > i:
-			heart.texture = HEART_HALF
+			heart.texture = preload("res://sprites/ui/heart_half.png")
 		else:
-			heart.texture = HEART_EMPTY
+			heart.texture = preload("res://sprites/ui/heart_empty.png")
 		hearts.add_child(heart)
 
 func show_notice(message, seconds = 3.0):
@@ -550,7 +550,7 @@ func _unhandled_input(event):
 		return
 	if not dialogue.visible:
 		return
-	var pressed = event.is_action_pressed("ui_accept")
+	var pressed = event.is_action_pressed("ui_accept") ## accept THIS lmao prob shudnt be able to spam but oh well
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		pressed = true
 	if not pressed:
